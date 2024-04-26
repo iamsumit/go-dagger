@@ -19,7 +19,15 @@ jobs:
 
       - name: Hello world
         run: echo "Hello World!"
-  
+
+      - name: Hello world using daggerverse/hello
+        uses: dagger/dagger-for-github@v5
+        with:
+          version: "0.11.1"
+          verb: call
+          module: github.com/shykes/daggerverse/hello
+          args: hello
+
   dagger-hello-world:
     name: Dagger Hello World
     runs-on: ubuntu-latest

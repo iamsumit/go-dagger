@@ -1,0 +1,79 @@
+name: learn-github-actions
+
+run-name: ${{ github.actor }} is learning GitHub Actions
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  hello-world:
+    name: Hello World
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Hello world
+        run: echo "Hello World!"
+  
+  dagger-hello-world:
+    name: Dagger Hello World
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Call Dagger Hello World
+        uses: dagger/dagger-for-github@v5
+        with:
+          version: "0.11.1"
+          verb: call
+          module: dagger
+          args: hello
+
+  dagger-test:
+    name: Dagger Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Call Dagger Test
+        uses: dagger/dagger-for-github@v5
+        with:
+          version: "0.11.1"
+          verb: call
+          module: dagger
+          args: test --dir=app
+
+  dagger-buid-deploy:
+    name: Dagger build & deploy
+    needs: dagger-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Call Dagger Build and Deploy
+        uses: dagger/dagger-for-github@v5
+        with:
+          version: "0.11.1"
+          verb: call
+          module: dagger
+          args: build-and-publish --dir=app --args="-C","./"
+
+  verify-build:
+    name: Verify Build
+    needs: dagger-buid-deploy
+    runs-on: ubuntu-latest
+
+    container:
+      image: ttl.sh/my-hello-container
+
+    steps:
+      - name: Verify the binary
+        run: /usr/local/bin/app

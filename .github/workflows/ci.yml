@@ -10,8 +10,8 @@ on:
 
 jobs:
 
-  hello-world:
-    name: Hello World
+  hello:
+    name: Hello
     runs-on: ubuntu-latest
 
     steps:
@@ -28,8 +28,8 @@ jobs:
           module: github.com/shykes/daggerverse/hello
           args: hello
 
-  dagger-hello-world:
-    name: Dagger Hello World
+  dagger-hello:
+    name: Dagger Hello
     runs-on: ubuntu-latest
 
     steps:
@@ -40,8 +40,8 @@ jobs:
         with:
           version: "0.11.1"
           verb: call
-          module: dagger
-          args: hello
+          module: build
+          args: --src ./app hello
 
   dagger-test:
     name: Dagger Test
@@ -55,8 +55,8 @@ jobs:
         with:
           version: "0.11.1"
           verb: call
-          module: dagger
-          args: test --dir=app
+          module: build
+          args: --src ./app deps test output
 
   dagger-buid-deploy:
     name: Dagger build & deploy
@@ -71,8 +71,8 @@ jobs:
         with:
           version: "0.11.1"
           verb: call
-          module: dagger
-          args: build-and-publish --dir=app --args="-C","./"
+          module: build
+          args: --src ./app deps build publish
 
   verify-build:
     name: Verify Build
@@ -80,8 +80,8 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ttl.sh/my-hello-container
+      image: ttl.sh/go-dagger-container
 
     steps:
       - name: Verify the binary
-        run: /usr/local/bin/app
+        run: /app/build
